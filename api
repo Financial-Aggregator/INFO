@@ -1,4 +1,58 @@
 API
 
+Коды ответов — что когда
+
+Код	Когда
+200 OK	GET, PUT, PATCH успех
+201 Created + Location	POST создал сущность
+202 Accepted	Асинхронная операция (генерация выписки)
+204 No Content	DELETE успех
+400 Bad Request	Невалидное тело/параметры
+401 Unauthorized	Нет/просрочен JWT
+403 Forbidden	JWT есть, но роль не позволяет
+404 Not Found	Ресурс не существует или не принадлежит клиенту
+422 Unprocessable Entity	Нарушено бизнес-правило (недостаточно средств, превышен лимит, Idempotency-Key переиспользован с другим телом)
+429 Too Many Requests + Retry-After	Rate limit
+503 Service Unavailable	Circuit Breaker разомкнут
+
+
 User
 create: v1/
+
+
+Auth
+через Gateway, без JWT)
+
+Метод	Путь	Назначение
+POST	/api/v1/auth/register	Регистрация
+POST	/api/v1/auth/login	Выдаёт access_token + refresh_token + mfa_required
+POST	/api/v1/auth/refresh	Обновление access-токена
+POST	/api/v1/auth/logout	Отзыв refresh-токена
+GET	/api/v1/auth/me	Текущий пользователь (роль, клиент, разрешения)
+
+
+Account
+
+Метод	Путь	Назначение
+GET	/api/v1/accounts	Список счетов клиента
+GET	/api/v1/accounts/{accountId}	Детали счёта (баланс, статус)
+GET	/api/v1/accounts/{accountId}/balance	Только баланс (лёгкий эндпоинт)
+GET	/api/v1/accounts/{accountId}/transactions	История (пагинация, фильтры from/to/type)
+
+
+Payment
+
+Метод	Путь	Назначение
+POST	/api/v1/payments	Создать платёж
+GET	/api/v1/payments/{paymentId}	Статус платежа
+
+
+Card
+
+Метод	Путь	Назначение
+GET	/api/v1/cards	Список карт клиента
+GET	/api/v1/cards/{cardId}	Детали
+POST	/api/v1/cards	Заказ новой карты
+POST	/api/v1/cards/{cardId}/block	Блокировка
+POST	/api/v1/cards/{cardId}/unblock	Разблокировка
+GET	/api/v1/cards/{cardId}/transactions	Операции по карте
